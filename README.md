@@ -35,6 +35,8 @@ Recommended Folder Hierarchy
 ├── Mechanical/           # STL files for 3D printing
 ├── Docs/                 # PDF of the SSRN publication
 └── README.md             # Project documentation
+
+
 ![69423c05-e9c4-4cf8-af80-ad996a0f7f73](https://github.com/user-attachments/assets/1517cb47-221d-4212-911c-abdd45b4a19e)
 ![fb97c1e6-9a8e-47df-af20-10564a73d50f](https://github.com/user-attachments/assets/8e4c9dee-a211-4ea9-959c-e25e6e9c5e13)
 ![5680a868-87f4-418b-b93c-172e4bf59f35](https://github.com/user-attachments/assets/eb654bda-2fd3-4126-a63b-e73c70f145d3)
