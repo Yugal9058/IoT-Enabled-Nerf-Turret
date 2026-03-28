@@ -1,0 +1,121 @@
+
+use serial Bluetooth terminal app for communication
+
+#include <SoftwareSerial.h>
+#include <Servo.h>
+
+// Define pins for HC-05 communication
+SoftwareSerial bluetooth(10, 11); // RX, TX pins (HC-05 TXD to pin 10, RXD to pin 11 with voltage divider)
+
+// Define servo objects and pins
+Servo panServo;   // Pan servo on pin 9
+Servo tiltServo;  // Tilt servo on pin 6
+Servo shootServo; // Shoot servo on pin 5
+const int PAN_PIN = 9;
+const int TILT_PIN = 6;
+const int SHOOT_PIN = 5;
+
+void setup() {
+  // Initialize Serial Monitor for debugging
+  Serial.begin(9600);
+  while (!Serial) {
+    ; // Wait for Serial to initialize
+  }
+  Serial.println("Serial Monitor initialized successfully.");
+
+  // Initialize Bluetooth at 9600 baud (default for HC-05)
+  bluetooth.begin(9600);
+  Serial.println("Bluetooth HC-05 initialized at 9600 baud.");
+  Serial.println("Connect HC-05 TXD to pin 10, RXD to pin 11 (with voltage divider).");
+  Serial.println("Waiting for commands from Arduino Servo Controls app...");
+
+  // Attach servos to their pins
+  panServo.attach(PAN_PIN);
+  tiltServo.attach(TILT_PIN);
+  shootServo.attach(SHOOT_PIN);
+  // Set initial positions to 0 degrees
+  panServo.write(0);
+  tiltServo.write(0);
+  shootServo.write(0);
+  Serial.println("Servos (Pan, Tilt, Shoot) initialized at 0 degrees.");
+
+  // Send test message to Bluetooth app
+  bluetooth.println("Arduino is ready!");
+  Serial.println("Sent test message to Bluetooth app: 'Arduino is ready!'");
+}
+
+void loop() {
+  // Check if data is available from HC-05
+  if (bluetooth.available()) {
+    Serial.println("Data detected from HC-05...");
+    // Read the incoming command until newline
+    String command = bluetooth.readStringUntil('\n');
+    command.trim(); // Remove whitespace
+    if (command.length() > 0) {
+      Serial.print("Received command: ");
+      Serial.println(command);
+
+      // Parse command (expected format: "servo_number angle", e.g., "1 90")
+      int spaceIndex = command.indexOf(' ');
+      if (spaceIndex != -1) {
+        int servoNum = command.substring(0, spaceIndex).toInt();
+        int angle = command.substring(spaceIndex + 1).toInt();
+
+        // Validate angle (0–180 degrees)
+        if (angle >= 0 && angle <= 180) {
+          // Move the appropriate servo
+          switch (servoNum) {
+            case 1: // Pan servo
+              panServo.write(angle);
+              Serial.print("Pan servo moved to ");
+              Serial.print(angle);
+              Serial.println(" degrees.");
+              bluetooth.print("Pan set to ");
+              bluetooth.print(angle);
+              bluetooth.println(" degrees.");
+              break;
+            case 2: // Tilt servo
+              tiltServo.write(angle);
+              Serial.print("Tilt servo moved to ");
+              Serial.print(angle);
+              Serial.println(" degrees.");
+              bluetooth.print("Tilt set to ");
+              bluetooth.print(angle);
+              bluetooth.println(" degrees.");
+              break;
+            case 3: // Shoot servo
+              shootServo.write(angle);
+              Serial.print("Shoot servo moved to ");
+              Serial.print(angle);
+              Serial.println(" degrees.");
+              bluetooth.print("Shoot set to ");
+              bluetooth.print(angle);
+              bluetooth.println(" degrees.");
+              break;
+            default:
+              Serial.println("Invalid servo number (use 1 for Pan, 2 for Tilt, 3 for Shoot).");
+              bluetooth.println("Error: Invalid servo number.");
+              break;
+          }
+        } else {
+          Serial.print("Invalid angle: ");
+          Serial.println(angle);
+          bluetooth.print("Error: Invalid angle ");
+          bluetooth.println(angle);
+        }
+      } else {
+        Serial.println("Invalid command format (expected 'servo_number angle').");
+        bluetooth.println("Error: Invalid command format.");
+      }
+    } else {
+      Serial.println("Received empty command.");
+    }
+  }
+
+  // Print heartbeat message every 5 seconds
+  static unsigned long lastHeartbeat = 0;
+  if (millis() - lastHeartbeat >= 5000) {
+    Serial.println("Program running... Waiting for Bluetooth commands.");
+    lastHeartbeat = millis();
+  }
+}
