@@ -19,7 +19,7 @@ Power: 9V DC Adapter, USB Cable, and LM2596 Buck Converters.
 Chassis: Custom 3D-printed mechanical frame.
 
 5. Software Requirements
-Language: C++.
+Language: Python.
 IDE: Arduino IDE.
 Libraries: Servo.h (for PWM control) and SoftwareSerial (for Bluetooth communication).
 
